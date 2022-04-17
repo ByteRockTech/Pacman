@@ -144,22 +144,21 @@ def multiFoodSearch(problem):
         state, actions = open.pop()  # 把Open表的第一个节点取出；
         if problem.isGoalState(state): # 考察节点n是否为目标节点，若是则得到问题的解成功退出
             return actions 
-        close.append(state) # 节点n扩展后放入Closed表
-        successors = problem.getSuccessors(state)    # 扩展节点n，获取到子节点序列
-        for sub in successors:  # 子节点序列加入open表中（如果是已经扩展过的节点，则不加入）
-            subState = sub[0]
-            subDir = sub[1]
-            if subState not in close:
-                newActions = actions + [subDir]
-                cost = problem.getCostOfActions(newActions)
-
-                count = 0
-                subSuccessors = problem.getSuccessors(subState)
-                for subsub in subSuccessors:
-                    if problem.isGoalState(subsub[0]):
-                        count+=0.1
-                cost = cost + count
-
+        if state not in close:
+            close.append(state) # 节点n扩展后放入Closed表
+            successors = problem.getSuccessors(state)    # 扩展节点n，获取到子节点序列
+            for sub in successors:  # 子节点序列加入open表中（如果是已经扩展过的节点，则不加入）
+                subState = sub[0]
+                subDir = sub[1]
+                if subState not in close:
+                    newActions = actions + [subDir]
+                    cost = problem.getCostOfActions(newActions)
+                    count = 0
+                    subSuccessors = problem.getSuccessors(subState)
+                    for subsub in subSuccessors:
+                        if problem.isGoalState(subsub[0]):
+                            count+=0.1
+                    cost = cost + count
                 open.push((subState, newActions), cost)
     return open
 
