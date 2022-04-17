@@ -17,6 +17,8 @@ In search.py, you will implement generic search algorithms which are called by
 Pacman agents (in searchAgents.py).
 """
 
+from cmath import cos
+from sqlalchemy import null
 import util
 
 class SearchProblem:
@@ -97,6 +99,24 @@ def breadthFirstSearch(problem):
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
+    start = problem.getStartState()    #获取初始状态
+    open = util.PriorityQueue()
+    open.push((start, []) ,0)
+    close = []
+    while not open.isEmpty():   # 检查Open表是否为空表
+        state, actions = open.pop()  # 把Open表的第一个节点取出；
+        if problem.isGoalState(state): # 考察节点n是否为目标节点，若是则得到问题的解成功退出
+            return actions 
+        close.append(state) # 节点n扩展后放入Closed表
+        successors = problem.getSuccessors(state)    # 扩展节点n，获取到子节点序列
+        for sub in successors:  # 子节点序列加入open表中（如果是已经扩展过的节点，则不加入）
+            subState = sub[0]
+            subDir = sub[1]
+            if subState not in close:
+                newActions = actions + [subDir]
+                cost = problem.getCostOfActions(newActions)
+                open.push((subState, newActions), cost)
+    return open
     util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
@@ -109,6 +129,66 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
+    start = problem.getStartState()
+    exstates = []
+    # 使用优先队列，每次扩展都是选择当前代价最小的方向
+    states = util.PriorityQueue()
+    states.push((start, []), nullHeuristic(start, problem))
+    nCost = 0
+    while not states.isEmpty():
+        state, actions = states.pop()
+        #目标测试
+        if problem.isGoalState(state):
+            return actions
+        #检查重复
+        if state not in exstates:
+            #扩展
+            successors = problem.getSuccessors(state)
+            for node in successors:
+                coordinate = node[0]
+                direction = node[1]
+                if coordinate not in exstates:
+                    newActions = actions + [direction]
+                    #计算动作代价和启发式函数值得和
+                    newCost = problem.getCostOfActions(newActions) + heuristic(coordinate, problem)
+                    states.push((coordinate, actions + [direction]), newCost)
+        exstates.append(state)
+    #返回动作序列
+    return actions
+    util.raiseNotDefined()
+    util.raiseNotDefined()
+
+
+# 针对多食物问题的代价优化求解
+def multiFoodSearch(problem):
+    """Search the node of least total cost first."""
+    "*** YOUR CODE HERE ***"
+    start = problem.getStartState()    #获取初始状态
+    open = util.PriorityQueue()
+    open.push((start, []) ,0)
+    close = []
+    while not open.isEmpty():   # 检查Open表是否为空表
+        state, actions = open.pop()  # 把Open表的第一个节点取出；
+        if problem.isGoalState(state): # 考察节点n是否为目标节点，若是则得到问题的解成功退出
+            return actions 
+        close.append(state) # 节点n扩展后放入Closed表
+        successors = problem.getSuccessors(state)    # 扩展节点n，获取到子节点序列
+        for sub in successors:  # 子节点序列加入open表中（如果是已经扩展过的节点，则不加入）
+            subState = sub[0]
+            subDir = sub[1]
+            if subState not in close:
+                newActions = actions + [subDir]
+                cost = problem.getCostOfActions(newActions)
+
+                count = 0
+                subSuccessors = problem.getSuccessors(subState)
+                for subsub in subSuccessors:
+                    if problem.isGoalState(subsub[0]):
+                        count+=0.1
+                cost = cost + count
+
+                open.push((subState, newActions), cost)
+    return open
     util.raiseNotDefined()
 
 
