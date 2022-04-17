@@ -362,24 +362,24 @@ def cornersHeuristic(state, problem):
     "*** YOUR CODE HERE ***"
     position, stateCorners = state[0], state[1]
     corners = problem.corners
-    nodes = []
+    unvisitedCorners = []
     # find all corners havent visited
     for i in range(len(corners)):
         if not stateCorners[i]:
-            nodes.append(corners[i])
+            unvisitedCorners.append(corners[i])
     cost = 0
     # find the min cost of visiting all corner in a line
     # with greedy algorythm
-    while len(nodes) > 0:
+    while len(unvisitedCorners) > 0:
         dists = []
-        for node in nodes:
-            dist = util.manhattanDistance(position, node)
+        for unvisitedCorner in unvisitedCorners:
+            dist = util.manhattanDistance(position, unvisitedCorner)
             dists.append(dist)
         minDist = min(dists)
         cost += minDist
         minDistIndex = dists.index(minDist)
-        position = nodes[minDistIndex]
-        del nodes[minDistIndex]
+        position = unvisitedCorners[minDistIndex]
+        del unvisitedCorners[minDistIndex]
     return cost # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):
