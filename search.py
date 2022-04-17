@@ -117,7 +117,6 @@ def uniformCostSearch(problem):
                 cost = problem.getCostOfActions(newActions)
                 open.push((subState, newActions), cost)
     return open
-    util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
     """
@@ -129,33 +128,6 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    start = problem.getStartState()
-    exstates = []
-    # 使用优先队列，每次扩展都是选择当前代价最小的方向
-    states = util.PriorityQueue()
-    states.push((start, []), nullHeuristic(start, problem))
-    nCost = 0
-    while not states.isEmpty():
-        state, actions = states.pop()
-        #目标测试
-        if problem.isGoalState(state):
-            return actions
-        #检查重复
-        if state not in exstates:
-            #扩展
-            successors = problem.getSuccessors(state)
-            for node in successors:
-                coordinate = node[0]
-                direction = node[1]
-                if coordinate not in exstates:
-                    newActions = actions + [direction]
-                    #计算动作代价和启发式函数值得和
-                    newCost = problem.getCostOfActions(newActions) + heuristic(coordinate, problem)
-                    states.push((coordinate, actions + [direction]), newCost)
-        exstates.append(state)
-    #返回动作序列
-    return actions
-    util.raiseNotDefined()
     util.raiseNotDefined()
 
 
@@ -189,7 +161,6 @@ def multiFoodSearch(problem):
 
                 open.push((subState, newActions), cost)
     return open
-    util.raiseNotDefined()
 
 
 # Abbreviations
