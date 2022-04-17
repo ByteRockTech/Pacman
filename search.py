@@ -129,7 +129,28 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    startState = problem.getStartState()
+    obsoleteStates = []
+    states = util.PriorityQueue()
+    #  (state, actions to get this state), sort by heuristic
+    states.push((startState, []), heuristic(startState, problem))
+    action = []
+    while not states.isEmpty():
+        state, action = states.pop()
+        # if goal, return
+        if problem.isGoalState(state):
+            return action
+        if state not in obsoleteStates:
+            successors = problem.getSuccessors(state)
+            for successor in successors:
+                nextState = successor[0]
+                nextAction = successor[1]
+                if nextState not in obsoleteStates:
+                    newAction = action + [nextAction]
+                    newCost = problem.getCostOfActions(newAction) + heuristic(nextState, problem)
+                    states.push((nextState, newAction), newCost)
+            obsoleteStates.append(state)
+    return action
 
 
 # 针对多食物问题的代价优化求解
