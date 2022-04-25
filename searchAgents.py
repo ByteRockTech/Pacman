@@ -474,40 +474,21 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-
-    hvalue = 0
-    food_available = []
-    total_distance = 0
-    # 处理食物的位置，以此构造启发式函数
-    for i in range(0, foodGrid.width):
-        for j in range(0, foodGrid.height):
-            if (foodGrid[i][j] == True):
-                food_location = (i, j)
-                food_available.append(food_location)
-    # 没有食物就不用找了
-    if (len(food_available) == 0):
-        return 0
-        # 初始化距离(current_food,select_food,distance)
-    max_distance = ((0, 0), (0, 0), 0)
-    for current_food in food_available:
-        for select_food in food_available:
-            if (current_food == select_food):
-                pass
-            else:
-                # 使用曼哈顿距离构造启发式函数
-                distance = util.manhattanDistance(current_food, select_food)
-                if (max_distance[2] < distance):
-                    max_distance = (current_food, select_food, distance)
-    # 把起点和第一个搜索的食物连接起来
-    # 处理只有一个食物的情况
-    if (max_distance[0] == (0, 0) and max_distance[1] == (0, 0)):
-        hvalue = util.manhattanDistance(position, food_available[0])
+    foodRemain = {}
+    x,y = position
+    # 先把所有没有吃到过的豆豆的位置保存在字典中，并设置值的初始值为0
+    for food in foodGrid.asList():
+        foodRemain[food] = 0
+    # 然后从吃豆人当前的位置，求出吃掉实际步数最多豆豆的距离，因为其中会顺带吃掉其他的豆豆
+    if len(foodRemain)>0:
+        # 内部这个循环的目的是计算从当前位置(x,y)到每一个豆豆的实际距离，并保存下来
+        for nextNode in foodRemain.keys():
+            foodRemain[nextNode] = mazeDistance((x,y), nextNode, problem.startingGameState)
+        # 从一系列豆豆中找到实际步数最多的豆豆，并用其坐标更新(x,y)
+        x,y = max(foodRemain,key=lambda key:foodRemain[key])
+        return foodRemain[(x,y)]
     else:
-        d1 = util.manhattanDistance(position, max_distance[0])
-        d2 = util.manhattanDistance(position, max_distance[1])
-        hvalue = max_distance[2] + min(d1, d2)
-
-    return hvalue
+        return 0
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"

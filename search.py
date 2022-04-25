@@ -95,25 +95,27 @@ def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
     s = problem.getStartState()#初始状态
-    exstates = []#标记已搜索过的状态集合
-    states = util.Queue()#队列实现
-    states.push((s,[]))
-    while not states.isEmpty():
-        state, action = states.pop()
+    closed = []#标记已搜索过的状态集合
+    open = util.Queue()#队列实现
+    open.push((s,[]))
+    while not open.isEmpty():
+        #从open队列中取出先进入open的节点
+        state, path = open.pop()
         if problem.isGoalState(state):
             #检测目标
-            return action
-        if state not in exstates:
-            #检查重复
+            return path
+        if state not in closed:
+            #已扩展节点跳过
             successor = problem.getSuccessors(state)
-            exstates.append(state)
+            closed.append(state)
+            #扩展当前节点并加入已扩展集合
             #把后继节点加入队列：
             for node in successor:
                 coordinates = node[0]
                 direction = node[1]
-                if coordinates not in exstates:
-                    states.push((coordinates,action + [direction]))
-    return action
+                if coordinates not in closed:
+                    open.push((coordinates,path + [direction]))
+    return path
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
