@@ -474,7 +474,40 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+
+    hvalue = 0
+    food_available = []
+    total_distance = 0
+    # 处理食物的位置，以此构造启发式函数
+    for i in range(0, foodGrid.width):
+        for j in range(0, foodGrid.height):
+            if (foodGrid[i][j] == True):
+                food_location = (i, j)
+                food_available.append(food_location)
+    # 没有食物就不用找了
+    if (len(food_available) == 0):
+        return 0
+        # 初始化距离(current_food,select_food,distance)
+    max_distance = ((0, 0), (0, 0), 0)
+    for current_food in food_available:
+        for select_food in food_available:
+            if (current_food == select_food):
+                pass
+            else:
+                # 使用曼哈顿距离构造启发式函数
+                distance = util.manhattanDistance(current_food, select_food)
+                if (max_distance[2] < distance):
+                    max_distance = (current_food, select_food, distance)
+    # 把起点和第一个搜索的食物连接起来
+    # 处理只有一个食物的情况
+    if (max_distance[0] == (0, 0) and max_distance[1] == (0, 0)):
+        hvalue = util.manhattanDistance(position, food_available[0])
+    else:
+        d1 = util.manhattanDistance(position, max_distance[0])
+        d2 = util.manhattanDistance(position, max_distance[1])
+        hvalue = max_distance[2] + min(d1, d2)
+
+    return hvalue
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
