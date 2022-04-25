@@ -115,7 +115,7 @@ def breadthFirstSearch(problem):
                 direction = node[1]
                 if coordinates not in closed:
                     open.push((coordinates,path + [direction]))
-    return action
+    return path
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
