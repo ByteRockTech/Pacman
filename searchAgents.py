@@ -288,6 +288,8 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
+        self.right = right
+        self.top = top
 
     def getStartState(self):
         """
@@ -295,6 +297,9 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
+        allCorners = (False, False, False, False)
+        start = (self.startingPosition, allCorners)
+        return start
         util.raiseNotDefined()
 
     def isGoalState(self, state):
@@ -302,6 +307,9 @@ class CornersProblem(search.SearchProblem):
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
+        corners = state[1]
+        boolean = corners[0] and corners[1] and corners[2] and corners[3]
+        return boolean
         util.raiseNotDefined()
 
     def getSuccessors(self, state):
@@ -325,6 +333,31 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
+            x,y = state[0]
+            holdCorners = state[1]
+            #   dx, dy = Actions.directionToVector(action)
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            hitsWall = self.walls[nextx][nexty]
+            newCorners = ()
+            nextState = (nextx, nexty)
+            #不碰墙
+            if not hitsWall:
+                #能到达角落，四种情况判断
+                if nextState in self.corners:
+                    if nextState == (self.right, 1):
+                        newCorners = [True, holdCorners[1], holdCorners[2], holdCorners[3]]
+                    elif nextState == (self.right, self.top):
+                        newCorners = [holdCorners[0], True, holdCorners[2], holdCorners[3]]
+                    elif nextState == (1, self.top):
+                        newCorners = [holdCorners[0], holdCorners[1], True, holdCorners[3]]
+                    elif nextState == (1,1):
+                        newCorners = [holdCorners[0], holdCorners[1], holdCorners[2], True]
+                    successor = ((nextState, newCorners), action,  1)
+                #去角落的中途
+                else:
+                    successor = ((nextState, holdCorners), action, 1)
+                successors.append(successor)
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
@@ -341,7 +374,6 @@ class CornersProblem(search.SearchProblem):
             x, y = int(x + dx), int(y + dy)
             if self.walls[x][y]: return 999999
         return len(actions)
-
 
 def cornersHeuristic(state, problem):
     """
@@ -362,11 +394,23 @@ def cornersHeuristic(state, problem):
     "*** YOUR CODE HERE ***"
     position, stateCorners = state[0], state[1]
     corners = problem.corners
+    #find all the coners that havent been visited
+    top = problem.walls.height-2
+    right = problem.walls.width-2
     unvisitedCorners = []
-    # find all corners havent visited
-    for i in range(len(corners)):
-        if not stateCorners[i]:
-            unvisitedCorners.append(corners[i])
+    for corner in corners:
+        if corner == (1,1):
+            if not stateCorners[3]:
+                unvisitedCorners.append(corner)
+        if corner == (1, top):
+            if not stateCorners[2]:
+                unvisitedCorners.append(corner)
+        if corner == (right, top):
+            if not stateCorners[1]:
+                unvisitedCorners.append(corner)
+        if corner == (right, 1):
+            if not stateCorners[0]:
+                unvisitedCorners.append(corner)
     cost = 0
     # find the min cost of visiting all corner in a line
     # with greedy algorythm
