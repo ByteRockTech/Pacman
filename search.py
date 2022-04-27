@@ -89,13 +89,41 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
+    from util import Stack
+    from game import Directions
+
+    # next 候选， passed 走过的节点，path 记录路径
+    # 深度搜索选择栈
+    next = Stack()
+    passed = []
+
+    # 加入起始状态节点
+    next.push((problem.getStartState(), []))
+
+    # 如果候选不为空，则循环搜索
+    while not next.isEmpty():
+
+        # 当前节点
+        cur_node, actions = next.pop()
+
+        # 如果当前节点到达目标位置
+        if problem.isGoalState(cur_node):
+            return actions
+
+        if cur_node not in passed:
+            expand = problem.getSuccessors(cur_node)
+            passed.append(cur_node)
+            for location, direction, cost in expand:
+                if (location not in passed):
+                    next.push((location, actions + [direction]))
+
     util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
     s = problem.getStartState()#初始状态
-    closed = []#标记已搜索过的状态集合
+    passed = []#标记已搜索过的状态集合
     open = util.Queue()#队列实现
     open.push((s,[]))
     while not open.isEmpty():
@@ -104,16 +132,16 @@ def breadthFirstSearch(problem):
         if problem.isGoalState(state):
             #检测目标
             return path
-        if state not in closed:
+        if state not in passed:
             #已扩展节点跳过
             successor = problem.getSuccessors(state)
-            closed.append(state)
+            passed.append(state)
             #扩展当前节点并加入已扩展集合
             #把后继节点加入队列：
             for node in successor:
                 coordinates = node[0]
                 direction = node[1]
-                if coordinates not in closed:
+                if coordinates not in passed:
                     open.push((coordinates,path + [direction]))
     return path
 
@@ -129,7 +157,7 @@ def uniformCostSearch(problem):
         if problem.isGoalState(state): # 考察节点n是否为目标节点，若是则得到问题的解成功退出
             return actions 
         if state not in close:
-            close.append(state) # 节点n扩展后放入Closed表
+            close.append(state) # 节点n扩展后放入passed表
             successors = problem.getSuccessors(state)    # 扩展节点n，获取到子节点序列
             for sub in successors:  # 子节点序列加入open表中（如果是已经扩展过的节点，则不加入）
                 subState = sub[0]
@@ -187,7 +215,7 @@ def multiFoodSearch(problem):
         if problem.isGoalState(state): # 考察节点n是否为目标节点，若是则得到问题的解成功退出
             return actions 
         if state not in close:
-            close.append(state) # 节点n扩展后放入Closed表
+            close.append(state) # 节点n扩展后放入passed表
             successors = problem.getSuccessors(state)    # 扩展节点n，获取到子节点序列
             for sub in successors:  # 子节点序列加入open表中（如果是已经扩展过的节点，则不加入）
                 subState = sub[0]
